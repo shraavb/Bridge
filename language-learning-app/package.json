@@ -1,0 +1,25 @@
+{
+  "name": "language-learning-app",
+  "version": "1.0.0",
+  "description": "learn languages with Bridge!",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shraavb/Bridge.git#master"
+  },
+  "keywords": [
+    "llm",
+    "learn",
+    "languages",
+    "translation"
+  ],
+  "author": "shraavasti bhat",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shraavb/Bridge/issues"
+  },
+  "homepage": "https://github.com/shraavb/Bridge/tree/master#readme"
+}
