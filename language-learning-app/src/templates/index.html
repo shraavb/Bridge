@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Learning App</title>
+    <link rel="stylesheet" type="text/css" href="../static/styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>learn languages with Bridge</h1>
+    <!-- Language Selection Dropdown -->
+    <label for="language-select">Select Language:</label>
+    <select id="language-select">
+        <option value="english">English</option>
+        <option value="spanish">Spanish</option>
+        <option value="french">French</option>
+        <option value="german">German</option>
+        <option value="mandarin">Mandarin</option>
+        <!-- Add more languages as needed -->
+    </select>
+    <div id="scenario-selection">
+        <p>select a scenario</p>
+        <div id="scenario-buttons">
+            <button id="btn-business" onclick="switchScenario('business')">For Business</button>
+            <button id="btn-friends" onclick="switchScenario('friends')">To Make Friends</button>
+            <button id="btn-flirt" onclick="switchScenario('flirt')">To Flirt</button>
+        </div>
+    </div>
+
+    <div id="chat-containers">
+    </div>
+
+    <div id="chat-controls" style="display: none;">
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button id="send-button" onclick="sendDataToServer()">Send</button>
+    </div>
+</div>
+
+<!-- Notes Panel -->
+<div id="notes-panel">
+    <h2>My Notes</h2>
+    <ul id="notes-list">
+        <!-- Notes will be dynamically added here -->
+    </ul>
+    <input type="text" id="note-input" placeholder="Add a new word or note...">
+    <button id="add-note-btn">Add Note</button>
+</div>
+
+<button id="toggle-panel-btn">Notes Panel</button>
+<script src="../static/script.js"></script>
+</body>
+</html>
