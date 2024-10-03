@@ -1,12 +1,14 @@
-let selectedScenario = ''; // Global variable to store the selected scenario
 let bubbleClass = 'api'; // Default bubble class
 let selectedLanguage = 'english'; // Default language
 let constructedPrompt = "";
 let currentTabId = ''; // To track the active tab
 let activeScenario = null; // To keep track of the currently active scenario
+let selectedScenario = null; // Initialize the variable
 
 
-// Handle language selection
+
+
+// Handle language selection when you first enter the app
 document.getElementById('language-select').addEventListener('change', function() {
     const select = this;
     const selectedValue = select.value;
@@ -25,7 +27,7 @@ document.getElementById('language-select').addEventListener('change', function()
 
     selectedLanguage = selectedValue;
 
-    console.log("Selected Language:", selectedLanguage);
+    console.log("User has selected language:", selectedLanguage);
 });
 // Capitalize the first letter of a string
 function capitalizeFirstLetter(string) {
@@ -33,8 +35,12 @@ function capitalizeFirstLetter(string) {
 }
 
 function switchScenario(scenario) {
-    if (activeScenario === scenario) return; // Do nothing if the same scenario is already active
+    console.log(`Scenario received in switchScenario: ${scenario}`); // Log the received scenario
+
+    if (activeScenario != null && activeScenario === scenario) return; // Do nothing if the same scenario is already active
+
     selectedScenario = scenario;
+
     // Hide all chat containers
     const containers = document.querySelectorAll('#chat-containers .chat-container');
     containers.forEach(container => container.style.display = 'none');
@@ -45,14 +51,15 @@ function switchScenario(scenario) {
         selectedContainer.style.display = 'block';
     } else {
         // Create and display a new chat container if it doesn't exist
-        createChatContainer(scenario);
+        createChatContainer(selectedScenario);
     }
 
     // Update button styles
-    updateButtonStyles(scenario);
+    updateButtonStyles(selectedScenario);
 
     // Update active scenario
-    activeScenario = scenario;
+    activeScenario = selectedScenario;
+
     // Show the chat controls (input and send button) after a scenario is selected
     document.getElementById('chat-controls').style.display = 'block';
 }
@@ -60,41 +67,61 @@ function switchScenario(scenario) {
 function createChatContainer(scenario) {
     const chatContainers = document.getElementById('chat-containers');
 
+    // Ensure the chat containers element exists
     if (!chatContainers) {
-            console.error('Chat containers element not found.');
-            return;
-        }
+        console.error('Chat containers element not found.');
+        return;
+    }
 
-        // Check if the container already exists
-        let existingContainer = document.getElementById(`chat-${scenario}`);
-        if (existingContainer) {
-            existingContainer.style.display = 'block'; // Show the existing container
-            return; // No need to create a new one
-        }
+    // Check if the container already exists
+    let existingContainer = document.getElementById(`chat-${scenario}`);
+    if (existingContainer) {
+        existingContainer.style.display = 'block'; // Show the existing container
+        return; // No need to create a new one
+    }
 
+    // Create a new chat container
     const newContainer = document.createElement('div');
     newContainer.id = `chat-${scenario}`;
     newContainer.className = 'chat-container';
 
+    // Create and append the chat box
     const chatBox = document.createElement('div');
     chatBox.id = `chat-box-${scenario}`;
     newContainer.appendChild(chatBox);
 
+    // Append the new container to chatContainers
     chatContainers.appendChild(newContainer);
 
-    switch (scenario) {
-            case 'business':
-                message = "Meet Dan, your language coach";
-                break;
-            case 'friends':
-                message = "Meet Lisa, your conversation buddy";
-                break;
-            case 'flirt':
-                message = "Meet Alex, your charming tutor";
-                break;
-        }
+    // Debugging logs to verify the new container
+    console.log(`Created new chat container for ${scenario}`);
+    console.log(newContainer);
 
+    // Initialize the message variable
+    let message = '';
+
+    // Set the message based on the scenario
+    switch (scenario) {
+        case 'business':
+            message = "Meet Dan, your language coach";
+            break;
+        case 'friends':
+            message = "Meet Lisa, your conversation buddy";
+            break;
+        case 'flirt':
+            message = "Meet Alex, your charming tutor";
+            break;
+        default:
+            console.error(`Unknown scenario: ${scenario}`);
+            return; // Exit if the scenario is unknown
+    }
+
+    // Display the message in the new chat box
     displayMessage(message, "system", scenario);
+
+    // Want to set selected scenario as active only once it's chat box is created
+
+    activeScenario = selectedScenario;
 }
 
 function updateButtonStyles(activeScenario) {
@@ -112,7 +139,8 @@ function updateButtonStyles(activeScenario) {
 }
 
 function processLLMOutput(llmOutput, scenario) {
-    console.log('LLM Output:', llmOutput); // Print the LLM output to the console
+     console.log('LLM Output:', llmOutput); // Print the LLM output to the console
+     console.log('Scenario passed:', scenario); // Log the passed scenario
 
     const container = document.createElement('div');
     container.className = 'formatted-output';
@@ -167,6 +195,7 @@ function processLLMOutput(llmOutput, scenario) {
 
 
 function displayMessage(message, origin, scenario) {
+    console.log(`Scenario: ${scenario}`);
     const chatBox = document.getElementById(`chat-box-${scenario}`);
 
     if (!chatBox) {
@@ -174,18 +203,30 @@ function displayMessage(message, origin, scenario) {
         return;
     }
 
+    // Create a message container to use flex for alignment
+    const messageContainer = document.createElement('div');
+    messageContainer.className = 'chat-message'; // Flex container for message alignment
+
     const chatBubble = document.createElement('div');
     chatBubble.className = 'chat-bubble';
 
     if (origin === 'user') {
         chatBubble.innerText = message;
+        messageContainer.classList.add('user-message'); // Add class for user alignment
     } else if (origin === 'system') {
-        chatBubble.className += ` ${scenario}`;
-        message = processLLMOutput(message); // Process the LLM output
+        chatBubble.className += ` ${scenario}`; // Add scenario class for styling
+        message = processLLMOutput(message, scenario); // Process the LLM output
         chatBubble.innerHTML = message; // Set the processed HTML
+        messageContainer.classList.add('system-message'); // Add class for system alignment
     }
 
-    chatBox.appendChild(chatBubble);
+    // Append the chat bubble to the message container
+    messageContainer.appendChild(chatBubble);
+
+    // Append the message container to the chatBox
+    chatBox.appendChild(messageContainer);
+
+    // Scroll to the bottom of the chat box
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
@@ -209,7 +250,7 @@ function switchToTab(tabId) {
 function generateContextualPrompt(scenario, userMessage) {
     let scenarioPrompt = "";
 
-    switch (selectedScenario) {
+    switch (scenario) {
         case 'business':
             scenarioPrompt = 'You are an experienced business consultant named Dan. Keep the response short to less than 2 lines. Provide a professional response to the following inquiry. Structure the response as follows: ' +
             '1. A brief greeting. ' +
@@ -250,9 +291,9 @@ function generateContextualPrompt(scenario, userMessage) {
 
 // Add an event listener for the Enter key
 document.getElementById('user-input').addEventListener('keypress', function(event) {
-    if (event.key === 'Enter') {
+    if (event.key === 'Enter' && selectedScenario != null) {
         event.preventDefault(); // Prevent the default action (e.g., form submission)
-        sendDataToServer(selectedScenario);
+        sendDataToServer();
     }
 });
 
@@ -289,12 +330,13 @@ document.getElementById('note-input').addEventListener('keypress', function(even
 });
 
 // Function to handle sending data to the server
-function sendDataToServer(scenario) {
+function sendDataToServer() {
+    console.log('send data to server scenario:', selectedScenario); // Print the LLM output to the console
     const userInput = document.getElementById(`user-input`).value;
     if (userInput.trim() === "") return; // Prevent sending empty input
 
     //display the user's message
-    displayMessage(userInput, 'user', scenario);
+    displayMessage(userInput, 'user', selectedScenario);
 
     fetch('/update_data', {
         method: 'POST',
@@ -302,7 +344,7 @@ function sendDataToServer(scenario) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            selectedScenario: scenario,
+            selectedScenario: selectedScenario,
             selectedLanguage: selectedLanguage,
             constructedPrompt: userInput
         })
@@ -316,11 +358,11 @@ function sendDataToServer(scenario) {
     .then(data => {
         console.log(data);
         // Display the cleaned and formatted response message
-        displayMessage(data.result, "system", scenario);
+        displayMessage(data.result, "system", selectedScenario);
     })
     .catch(error => {
         console.error('Error:', error);
-        displayMessage("An error occurred while sending your message.", 'error', scenario);
+        displayMessage("An error occurred while sending your message.", 'error', selectedScenario);
     });
 
     // Clear the input field after sending

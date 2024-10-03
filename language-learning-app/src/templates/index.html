@@ -10,7 +10,7 @@
 <div class="container">
     <h1>learn languages with Bridge</h1>
     <!-- Language Selection Dropdown -->
-    <label for="language-select">Select Language:</label>
+    <label for="language-select" class="bold-label">select a language:</label>
     <select id="language-select">
         <option value="english">English</option>
         <option value="spanish">Spanish</option>
@@ -28,10 +28,11 @@
         </div>
     </div>
 
-    <div id="chat-containers">
-    </div>
+    <div id="chat-containers" style="padding-left: 60px;
+         padding-right: 60px;"></div>
 
-    <div id="chat-controls" style="display: none;">
+    <div id="chat-controls" style="display: none; padding-left: 60px;
+         padding-right: 60px;">
         <input type="text" id="user-input" placeholder="Type your message...">
         <button id="send-button" onclick="sendDataToServer()">Send</button>
     </div>
